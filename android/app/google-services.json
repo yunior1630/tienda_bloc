@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "419483250156",
+    "project_id": "tiendabloc-532e1",
+    "storage_bucket": "tiendabloc-532e1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419483250156:android:4e793387bef3eb4435e4c9",
+        "android_client_info": {
+          "package_name": "com.example.tienda_bloc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "419483250156-of7etm6n7qmd3amkujg0lu576284p0jp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tienda_bloc",
+            "certificate_hash": "c19bbaa418d4aaa864fad893aa647b46f8ac2b23"
+          }
+        },
+        {
+          "client_id": "419483250156-ciie5ok4145unsbuc2ghuq6lsnfb3gug.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYFT8m-WmJR2IZsPmU793JfK3UnF4e85M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "419483250156-ciie5ok4145unsbuc2ghuq6lsnfb3gug.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "419483250156-fftlvuk0f2taph59h5shuvd7noje7ou6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tiendaBloc"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
