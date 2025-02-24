@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tienda_bloc/config/routes/app_routes.dart';
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_event.dart';
 import 'package:tienda_bloc/features/product/presentation/bloc/product_state.dart';
@@ -22,15 +23,13 @@ class HomePage extends StatelessWidget {
               BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
           Stack(
             children: [
               IconButton(
                 icon: const Icon(Icons.shopping_cart, color: Colors.white),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.cart);
+                },
               ),
               const Positioned(
                 right: 8,
@@ -148,7 +147,7 @@ class HomePage extends StatelessWidget {
                     itemCount: state.products.length,
                     itemBuilder: (context, index) {
                       final product = state.products[index];
-                      return _buildBestSellerItem(product);
+                      return _buildBestSellerItem(product, context);
                     },
                   ),
                 );
@@ -162,65 +161,68 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBestSellerItem(ProductEntity product) {
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 5,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
-              child: Image.network(
-                product.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                      "assets/nike_shoe.png"); // Imagen por defecto si fall  a
-                },
+  Widget _buildBestSellerItem(ProductEntity product, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.productDetail,
+          arguments: product, // Pasamos el producto como argumento
+        );
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 5,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
+                child: Image.network(
+                  product.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset("assets/nike_shoe.png");
+                  },
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Row(
-                  children: [
-                    Text("\$${product.price}",
-                        style:
-                            const TextStyle(color: Colors.blue, fontSize: 16)),
-                    const SizedBox(width: 5),
-                    Text("\$${product.price}",
-                        style: const TextStyle(
-                            decoration: TextDecoration.lineThrough,
-                            fontSize: 12)),
-                    const SizedBox(width: 5),
-                    Text("${product.discount} off",
-                        style:
-                            const TextStyle(color: Colors.green, fontSize: 12)),
-                  ],
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(product.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      Text("\$${product.price}",
+                          style: const TextStyle(
+                              color: Colors.blue, fontSize: 16)),
+                      const SizedBox(width: 5),
+                      Text("${product.discount} off",
+                          style: const TextStyle(
+                              color: Colors.green, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
