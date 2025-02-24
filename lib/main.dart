@@ -28,7 +28,6 @@ import 'auth_wrapper.dart'; // ← Este widget decidirá a dónde ir (Login o Ho
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   // Inyección de dependencias
   final firestore = FirebaseFirestore.instance;
   final firebaseAuth = FirebaseAuth.instance;
@@ -84,8 +83,7 @@ class MyApp extends StatelessWidget {
             signInWithGoogle: signInWithGoogleUseCase,
             signInWithEmail: signInWithEmailUseCase,
             signOut: signOutUseCase,
-          )..add(
-              CheckAuthEvent()), // Verifica si el usuario está autenticado al iniciar
+          )..add(CheckAuthEvent()),
         ),
         BlocProvider<ProductBloc>(
           create: (context) => ProductBloc(getProducts: getProductsUseCase)

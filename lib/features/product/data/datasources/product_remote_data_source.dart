@@ -3,6 +3,7 @@ import '../models/product_model.dart';
 
 abstract class ProductRemoteDataSource {
   Future<List<ProductModel>> getProducts();
+  Future<void> addProduct(ProductModel product); // 🔥 Nueva función
 }
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
@@ -16,5 +17,12 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     return querySnapshot.docs
         .map((doc) => ProductModel.fromJson(doc.data(), doc.id))
         .toList();
+  }
+
+  @override
+  Future<void> addProduct(ProductModel product) async {
+    await firestore
+        .collection('products')
+        .add(product.toJson()); // 🔥 Subir a Firestore
   }
 }

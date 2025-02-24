@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tienda_bloc/config/routes/app_routes.dart';
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_event.dart';
-import 'package:tienda_bloc/features/product/presentation/bloc/product_state.dart';
-import '../bloc/product_bloc.dart';
-import '../../domain/entities/product_entity.dart';
+import 'package:tienda_bloc/features/product/data/models/product_model.dart';
+import 'package:tienda_bloc/features/product/data/datasources/product_remote_data_source.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/add_product_form.dart';
 
 class HomePage extends StatelessWidget {
+  final ProductRemoteDataSourceImpl productDataSource =
+      ProductRemoteDataSourceImpl(firestore: FirebaseFirestore.instance);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +21,7 @@ class HomePage extends StatelessWidget {
         title: _buildSearchBar(),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
             },
@@ -51,13 +54,13 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // _buildPromoBanner(),
             _buildCategorySection(),
-            _buildBestSellerSection(context),
+            _buildProductCarousel(context, "Mejores Ventas", "products"),
+            _buildProductCarousel(context, "Nuevos Productos", "new_products"),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: _buildBottomNavBar(context),
     );
   }
 
@@ -71,21 +74,10 @@ class HomePage extends StatelessWidget {
       ),
       child: const TextField(
         decoration: InputDecoration(
-          hintText: "Search",
+          hintText: "Buscar productos...",
           prefixIcon: Icon(Icons.search, color: Colors.blue),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(vertical: 10),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPromoBanner() {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset("assets/banner.png", fit: BoxFit.cover),
       ),
     );
   }
@@ -96,15 +88,19 @@ class HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle("Category"),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text("Categorías",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildCategoryItem(Icons.checkroom, "Fashion"),
-              _buildCategoryItem(Icons.devices, "Electronics"),
-              _buildCategoryItem(Icons.phone_android, "Mobiles"),
-              _buildCategoryItem(Icons.local_grocery_store, "Grocery"),
+              _buildCategoryItem(Icons.checkroom, "Moda"),
+              _buildCategoryItem(Icons.devices, "Electrónica"),
+              _buildCategoryItem(Icons.phone_android, "Móviles"),
+              _buildCategoryItem(Icons.local_grocery_store, "Supermercado"),
             ],
           ),
         ],
@@ -127,33 +123,41 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBestSellerSection(BuildContext context) {
+  Widget _buildProductCarousel(
+      BuildContext context, String title, String collection) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle("Best Seller"),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(title,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
           const SizedBox(height: 10),
-          BlocBuilder<ProductBloc, ProductState>(
-            builder: (context, state) {
-              if (state is ProductLoading) {
+          StreamBuilder<QuerySnapshot>(
+            stream:
+                FirebaseFirestore.instance.collection(collection).snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData)
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is ProductLoaded) {
-                return Container(
-                  height: 200,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.products.length,
-                    itemBuilder: (context, index) {
-                      final product = state.products[index];
-                      return _buildBestSellerItem(product, context);
-                    },
-                  ),
-                );
-              } else {
-                return const Center(child: Text("Error al cargar productos"));
-              }
+              final products = snapshot.data!.docs
+                  .map((doc) => ProductModel.fromJson(
+                      doc.data() as Map<String, dynamic>, doc.id))
+                  .toList();
+              return SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return _buildProductItem(product);
+                  },
+                ),
+              );
             },
           ),
         ],
@@ -161,96 +165,77 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBestSellerItem(ProductEntity product, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.productDetail,
-          arguments: product, // Pasamos el producto como argumento
-        );
-      },
-      child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
+  Widget _buildProductItem(ProductModel product) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
               color: Colors.grey.withOpacity(0.3),
               blurRadius: 5,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.network(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset("assets/nike_shoe.png");
-                  },
+              spreadRadius: 2),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: Image.network(product.imageUrl,
+                height: 130, width: double.infinity, fit: BoxFit.cover),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(product.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    Text("\$${product.price}",
+                        style:
+                            const TextStyle(color: Colors.blue, fontSize: 16)),
+                    const SizedBox(width: 5),
+                    Text("${product.discount} off",
+                        style:
+                            const TextStyle(color: Colors.green, fontSize: 12)),
+                  ],
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(product.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Row(
-                    children: [
-                      Text("\$${product.price}",
-                          style: const TextStyle(
-                              color: Colors.blue, fontSize: 16)),
-                      const SizedBox(width: 5),
-                      Text("${product.discount} off",
-                          style: const TextStyle(
-                              color: Colors.green, fontSize: 12)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        TextButton(
-          onPressed: () {},
-          child: const Text("View All", style: TextStyle(color: Colors.blue)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(BuildContext context) {
     return BottomNavigationBar(
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
       currentIndex: 0,
+      onTap: (index) {
+        if (index == 1) {
+          _mostrarFormularioAgregarProducto(context);
+        }
+      },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline), label: "Agregar"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Perfil"),
       ],
+    );
+  }
+
+  void _mostrarFormularioAgregarProducto(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AddProductForm(),
     );
   }
 }
