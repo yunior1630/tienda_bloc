@@ -1,7 +1,3 @@
-Aquí tienes la documentación para GitHub sobre cómo ejecutar el proyecto en tu máquina local. 📄🚀  
-
----
-
 # **🛍 Tienda Bloc - Documentación de Instalación y Ejecución**
 
 ### 📌 **Descripción del Proyecto**
