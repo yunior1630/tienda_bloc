@@ -9,7 +9,6 @@ import 'package:tienda_bloc/features/cart/data/repositories/cart_repository_impl
 import 'package:tienda_bloc/features/cart/domain/repositories/cart_repository.dart';
 import 'package:tienda_bloc/features/cart/domain/usecases/agregar_producto_usecase.dart';
 import 'package:tienda_bloc/features/cart/domain/usecases/modificar_cantidad_usecase.dart';
-import 'package:tienda_bloc/features/cart/domain/usecases/obtener_carrito_usecase.dart';
 import 'package:tienda_bloc/features/cart/domain/usecases/vaciar_carrito_usecase.dart';
 import 'package:tienda_bloc/features/cart/presentation/bloc/cart_bloc.dart';
 import 'package:tienda_bloc/features/product/presentation/bloc/product_event.dart';
@@ -67,6 +66,7 @@ class MyApp extends StatelessWidget {
   final CartRepository cartRepository;
 
   const MyApp({
+    super.key,
     required this.signInWithGoogleUseCase,
     required this.signInWithEmailUseCase,
     required this.signOutUseCase,
@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Shop',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: AuthWrapper(), // ← Determina si va a LoginPage o HomePage
+        home: const AuthWrapper(), // ← Determina si va a LoginPage o HomePage
         onGenerateRoute: AppRoutes.generateRoute,
       ),
     );

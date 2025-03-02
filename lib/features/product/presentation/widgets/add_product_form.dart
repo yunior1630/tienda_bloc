@@ -7,6 +7,8 @@ class AddProductForm extends StatelessWidget {
   final ProductRemoteDataSourceImpl productDataSource =
       ProductRemoteDataSourceImpl(firestore: FirebaseFirestore.instance);
 
+  AddProductForm({super.key});
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController nameController = TextEditingController();
@@ -17,7 +19,7 @@ class AddProductForm extends StatelessWidget {
     final TextEditingController descriptionController = TextEditingController();
 
     return AlertDialog(
-      title: Text("Agregar Producto"),
+      title: const Text("Agregar Producto"),
       content: SingleChildScrollView(
         child: Column(
           children: [
@@ -42,10 +44,11 @@ class AddProductForm extends StatelessWidget {
               rating: double.parse(ratingController.text),
               description: descriptionController.text,
             );
+            final navigator = Navigator.of(context);
             await productDataSource.addProduct(product);
-            Navigator.pop(context);
+            navigator.pop();
           },
-          child: Text("Guardar"),
+          child: const Text("Guardar"),
         ),
       ],
     );
@@ -60,7 +63,7 @@ class AddProductForm extends StatelessWidget {
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
       ),
     );

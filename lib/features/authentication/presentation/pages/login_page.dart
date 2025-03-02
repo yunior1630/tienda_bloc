@@ -7,11 +7,13 @@ import '../../../product/presentation/pages/home_page.dart';
 import '../bloc/auth_bloc.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -24,15 +26,12 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.grey[100],
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          print("entre${state}");
           if (state is Authenticated) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => HomePage()),
             );
           } else if (state is AuthError) {
-            print("entre a");
-            print("error${_errorMessage}");
             setState(() {
               _errorMessage = state.message;
             });
@@ -57,15 +56,15 @@ class _LoginPageState extends State<LoginPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      Text(
+                      const Text(
                         "Welcome Back",
                         style: TextStyle(
                             fontSize: 26, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 5),
-                      Text("Enter your details below",
+                      const SizedBox(height: 5),
+                      const Text("Enter your details below",
                           style: TextStyle(color: Colors.grey)),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
                       // Animación de error con Lottie
                       if (_errorMessage != null)
@@ -77,9 +76,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             Text(
                               _errorMessage!,
-                              style: TextStyle(color: Colors.red, fontSize: 14),
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 14),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                           ],
                         ),
 
@@ -90,7 +90,8 @@ class _LoginPageState extends State<LoginPage> {
                           labelText: "Email Address",
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10)),
-                          prefixIcon: Icon(Icons.email, color: Colors.blue),
+                          prefixIcon:
+                              const Icon(Icons.email, color: Colors.blue),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       // Campo de Contraseña
                       TextFormField(
@@ -113,7 +114,8 @@ class _LoginPageState extends State<LoginPage> {
                           labelText: "Password",
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10)),
-                          prefixIcon: Icon(Icons.lock, color: Colors.blue),
+                          prefixIcon:
+                              const Icon(Icons.lock, color: Colors.blue),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -137,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       // Botón de Iniciar Sesión con Email
                       BlocBuilder<AuthBloc, AuthState>(
@@ -160,20 +162,21 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(vertical: 15),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 backgroundColor: Colors.blue,
                               ),
-                              child: Text("Sign in",
+                              child: const Text("Sign in",
                                   style: TextStyle(
                                       fontSize: 18, color: Colors.white)),
                             ),
                           );
                         },
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       // Botón de Google
                       SizedBox(
@@ -185,25 +188,25 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(color: Colors.blue),
+                              side: const BorderSide(color: Colors.blue),
                             ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset("assets/google_logo.png", height: 24),
-                              SizedBox(width: 10),
-                              Text("Continue with Google",
+                              const SizedBox(width: 10),
+                              const Text("Continue with Google",
                                   style: TextStyle(
                                       fontSize: 18, color: Colors.blue)),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -225,12 +228,12 @@ class _LoginPageState extends State<LoginPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(40),
           bottomRight: Radius.circular(40),
         ),
       ),
-      child: Center(
+      child: const Center(
         child: Text(
           "Tienda bloc",
           style: TextStyle(

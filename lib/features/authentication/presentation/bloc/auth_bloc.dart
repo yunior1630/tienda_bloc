@@ -66,12 +66,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         errorMessage = "Demasiados intentos, intente más tarde";
       }
 
-      print("Firebase Error: $errorMessage"); // Agregar logs para depuración
+      // Agregar logs para depuración
 
       emit(AuthError(
           errorMessage)); // 🚨 Asegurar que `AuthError` se emite correctamente
     } catch (e) {
-      print("Error inesperado: $e");
       emit(AuthError("Error inesperado, intente nuevamente."));
     }
   }

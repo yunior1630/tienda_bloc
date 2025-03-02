@@ -6,7 +6,7 @@ import '../bloc/cart_state.dart';
 import '../../domain/entities/cart_item_entity.dart';
 
 class CartPage extends StatelessWidget {
-  const CartPage({Key? key}) : super(key: key);
+  const CartPage({super.key});
 
   @override
   Widget build(BuildContext context) {

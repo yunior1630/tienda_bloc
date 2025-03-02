@@ -6,19 +6,18 @@ import 'package:tienda_bloc/features/product/presentation/pages/home_page.dart';
 import 'package:tienda_bloc/features/authentication/presentation/pages/login_page.dart';
 
 class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        print(
-            "Nuevo estado de autenticación: $state"); // 🔥 Verifica los cambios en la consola
-
         if (state is Authenticated) {
           return HomePage();
         } else if (state is Unauthenticated) {
-          return LoginPage(); // 🔥 Se muestra login si el usuario no está autenticado
+          return const LoginPage(); // 🔥 Se muestra login si el usuario no está autenticado
         } else {
-          return Scaffold(
+          return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }

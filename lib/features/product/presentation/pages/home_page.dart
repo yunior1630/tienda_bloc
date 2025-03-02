@@ -11,6 +11,8 @@ import '../widgets/add_product_form.dart';
 class HomePage extends StatelessWidget {
   final ProductRemoteDataSourceImpl productDataSource =
       ProductRemoteDataSourceImpl(firestore: FirebaseFirestore.instance);
+
+  HomePage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,8 +143,9 @@ class HomePage extends StatelessWidget {
             stream:
                 FirebaseFirestore.instance.collection(collection).snapshots(),
             builder: (context, snapshot) {
-              if (!snapshot.hasData)
+              if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
+              }
               final products = snapshot.data!.docs
                   .map((doc) => ProductModel.fromJson(
                       doc.data() as Map<String, dynamic>, doc.id))
