@@ -50,3 +50,5 @@ class ActualizarCarritoEvent extends CartEvent {
 
 // 🔥 Nuevo evento para forzar actualización cuando cambia el usuario
 class ActualizarUsuario extends CartEvent {}
+
+class SincronizarCarrito extends CartEvent {}

@@ -17,6 +17,22 @@ class CartItemEntity extends Equatable {
     );
   }
 
+  // ✅ Método para convertir a JSON
+  Map<String, dynamic> toJson() {
+    return {
+      "producto": producto.toJson(),
+      "cantidad": cantidad,
+    };
+  }
+
+  // ✅ Método para convertir desde JSON
+  factory CartItemEntity.fromJson(Map<String, dynamic> json) {
+    return CartItemEntity(
+      producto: ProductEntity.fromJson(json["producto"]),
+      cantidad: json["cantidad"],
+    );
+  }
+
   @override
   List<Object?> get props => [producto, cantidad];
 }

@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/cart_item_entity.dart';
 import '../../domain/repositories/cart_repository.dart';
 import '../../../product/domain/entities/product_entity.dart';
@@ -7,6 +9,7 @@ import '../../../product/domain/entities/product_entity.dart';
 class CartRepositoryImpl implements CartRepository {
   final FirebaseFirestore firestore;
   final FirebaseAuth firebaseAuth;
+  static const String cartKey = "CART_ITEMS";
 
   CartRepositoryImpl({required this.firestore, required this.firebaseAuth});
 
@@ -22,6 +25,7 @@ class CartRepositoryImpl implements CartRepository {
   Future<void> agregarProducto(ProductEntity producto) async {
     final userId = await _getUserId();
 
+    // Guardar en Firestore si hay conexión
     final cartRef =
         firestore.collection("carritos").doc(userId).collection("items");
     final doc = await cartRef.doc(producto.id).get();
@@ -41,6 +45,10 @@ class CartRepositoryImpl implements CartRepository {
         "cantidad": 1,
       });
     }
+
+    // Guardar en SharedPreferences también
+    await _guardarCarritoLocal(await _obtenerCarritoLocal()
+      ..add(CartItemEntity(producto: producto, cantidad: 1)));
   }
 
   @override
@@ -52,6 +60,11 @@ class CartRepositoryImpl implements CartRepository {
         .collection("items")
         .doc(productoId)
         .delete();
+
+    // También eliminar del almacenamiento local
+    final carrito = await _obtenerCarritoLocal();
+    carrito.removeWhere((item) => item.producto.id == productoId);
+    await _guardarCarritoLocal(carrito);
   }
 
   @override
@@ -67,6 +80,15 @@ class CartRepositoryImpl implements CartRepository {
     } else {
       await eliminarProducto(productoId);
     }
+
+    // También modificar en SharedPreferences
+    final carrito = await _obtenerCarritoLocal();
+    for (var item in carrito) {
+      if (item.producto.id == productoId) {
+        item = item.copyWith(cantidad: nuevaCantidad);
+      }
+    }
+    await _guardarCarritoLocal(carrito);
   }
 
   @override
@@ -104,5 +126,26 @@ class CartRepositoryImpl implements CartRepository {
     for (var doc in docs.docs) {
       await doc.reference.delete();
     }
+
+    // También limpiar el carrito local
+    await _guardarCarritoLocal([]);
+  }
+
+  // 📌 Métodos para SharedPreferences
+  Future<void> _guardarCarritoLocal(List<CartItemEntity> carrito) async {
+    final prefs = await SharedPreferences.getInstance();
+    final carritoJson =
+        jsonEncode(carrito.map((item) => item.toJson()).toList());
+    await prefs.setString(cartKey, carritoJson);
+  }
+
+  Future<List<CartItemEntity>> _obtenerCarritoLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final carritoJson = prefs.getString(cartKey);
+
+    if (carritoJson == null) return [];
+
+    final List<dynamic> carritoMap = jsonDecode(carritoJson);
+    return carritoMap.map((item) => CartItemEntity.fromJson(item)).toList();
   }
 }
