@@ -51,7 +51,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       if (user != null) {
         add(ActualizarUsuario());
       } else {
-        add(ActualizarCarritoEvent([]));
+        add(ActualizarCarritoEvent(const []));
       }
     });
   }
@@ -69,6 +69,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   // 🔄 Verifica si hay conexión a internet
   Future<bool> _tieneConexion() async {
     final result = await _connectivity.checkConnectivity();
+    // ignore: unrelated_type_equality_checks
     return result != ConnectivityResult.none;
   }
 
@@ -94,7 +95,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     _cartSubscription = cartRepository.escucharCarrito().listen((productos) {
       add(ActualizarCarritoEvent(productos));
     }, onError: (error) {
-      add(ActualizarCarritoEvent([]));
+      add(ActualizarCarritoEvent(const []));
     });
   }
 
@@ -165,11 +166,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         final List<CartItemEntity> carritoLocal =
             carritoMap.map((item) => CartItemEntity.fromJson(item)).toList();
 
-        carritoLocal.forEach((item) {
+        for (var item in carritoLocal) {
           if (item.producto.id == event.productoId) {
             item = item.copyWith(cantidad: event.nuevaCantidad);
           }
-        });
+        }
 
         await prefs.setString("CART_ITEMS",
             jsonEncode(carritoLocal.map((e) => e.toJson()).toList()));
