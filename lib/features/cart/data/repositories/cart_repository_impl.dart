@@ -15,14 +15,12 @@ class CartRepositoryImpl implements CartRepository {
     if (user == null) {
       throw Exception("Usuario no autenticado");
     }
-    print("✅ Usuario autenticado: ${user.uid}");
     return user.uid;
   }
 
   @override
   Future<void> agregarProducto(ProductEntity producto) async {
     final userId = await _getUserId();
-    print("🛒 Agregando producto para usuario: $userId");
 
     final cartRef =
         firestore.collection("carritos").doc(userId).collection("items");
@@ -43,8 +41,6 @@ class CartRepositoryImpl implements CartRepository {
         "cantidad": 1,
       });
     }
-
-    print("✅ Producto agregado correctamente en Firestore");
   }
 
   @override

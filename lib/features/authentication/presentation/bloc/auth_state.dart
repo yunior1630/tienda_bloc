@@ -13,27 +13,20 @@ class AuthLoading extends AuthState {}
 class Authenticated extends AuthState {
   final UserEntity user;
 
-  Authenticated(this.user) {
-    print(
-        "✅ Estado cambiado a: Authenticated (${user.email})"); // 🔥 Diagnóstico
-  }
+  Authenticated(this.user);
 
   @override
   List<Object?> get props => [user];
 }
 
 class Unauthenticated extends AuthState {
-  Unauthenticated() {
-    print("❌ Estado cambiado a: Unauthenticated"); // 🔥 Diagnóstico
-  }
+  Unauthenticated();
 }
 
 class AuthError extends AuthState {
   final String message;
 
-  AuthError(this.message) {
-    print("🚨 Estado cambiado a: AuthError - $message"); // 🔥 Diagnóstico
-  }
+  AuthError(this.message);
 
   @override
   List<Object?> get props => [message];

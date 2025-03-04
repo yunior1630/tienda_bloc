@@ -10,10 +10,10 @@ class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({super.key, required this.product});
 
   @override
-  _ProductDetailPageState createState() => _ProductDetailPageState();
+  ProductDetailPageState createState() => ProductDetailPageState();
 }
 
-class _ProductDetailPageState extends State<ProductDetailPage> {
+class ProductDetailPageState extends State<ProductDetailPage> {
   int cantidad = 1; // Contador de cantidad de productos
 
   @override

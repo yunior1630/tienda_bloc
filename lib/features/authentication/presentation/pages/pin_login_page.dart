@@ -4,11 +4,13 @@ import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_bloc.
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_event.dart';
 
 class PinLoginPage extends StatefulWidget {
+  const PinLoginPage({super.key});
+
   @override
-  _PinLoginPageState createState() => _PinLoginPageState();
+  PinLoginPageState createState() => PinLoginPageState();
 }
 
-class _PinLoginPageState extends State<PinLoginPage> {
+class PinLoginPageState extends State<PinLoginPage> {
   final TextEditingController _pinController = TextEditingController();
 
   @override
@@ -26,7 +28,7 @@ class _PinLoginPageState extends State<PinLoginPage> {
               controller: _pinController,
               keyboardType: TextInputType.number,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "PIN",
                 border: OutlineInputBorder(),
               ),

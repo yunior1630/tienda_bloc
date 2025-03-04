@@ -65,24 +65,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .get();
 
       if (querySnapshot.docs.isEmpty) {
-        print("❌ PIN incorrecto o no registrado en Firestore.");
         return null;
       }
 
       final userDoc = querySnapshot.docs.first;
-      final String uid = userDoc.id; // 🔥 UID basado en Firestore
+      // final String uid = userDoc.id; // 🔥 UID basado en Firestore
       final String email = userDoc['email'] ?? 'sin-email';
       final String displayName = userDoc['displayName'] ?? 'Usuario PIN';
-
-      print(
-          "✅ Usuario PIN encontrado con UID: $uid, autenticando en Firebase Auth...");
 
       // 🔹 Crear usuario con UID en Firebase Auth
       final userCredential = await FirebaseAuth.instance.signInAnonymously();
       final User? firebaseUser = userCredential.user;
 
       if (firebaseUser == null) {
-        print("❌ Error: No se pudo autenticar al usuario con PIN.");
         return null;
       }
 
@@ -92,7 +87,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         displayName: displayName,
       );
     } catch (e) {
-      print("🚨 Error al autenticar con PIN: $e");
       return null;
     }
   }

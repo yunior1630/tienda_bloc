@@ -107,10 +107,7 @@ class MyApp extends StatelessWidget {
       ],
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          print("🛑 Estado actual de AuthBloc: $state");
-
           if (state is Unauthenticated) {
-            print("✅ Usuario desautenticado, navegando a LoginPage");
             navigatorKey.currentState
                 ?.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
           }

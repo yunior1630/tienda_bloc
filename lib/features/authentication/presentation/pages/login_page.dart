@@ -216,7 +216,8 @@ class LoginPageState extends State<LoginPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => PinLoginPage()),
+                              MaterialPageRoute(
+                                  builder: (_) => const PinLoginPage()),
                             );
                           },
                           style: ElevatedButton.styleFrom(

@@ -41,12 +41,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user != null) {
-        print("👤 Usuario autenticado: ${user.uid}");
         add(ActualizarUsuario()); // 🔥 Dispara actualización del carrito
       } else {
-        print("❌ No hay usuario autenticado");
-        add(ActualizarCarritoEvent(
-            [])); // 🔄 Limpia el carrito si no hay usuario
+        add(ActualizarCarritoEvent(const []));
       }
     });
   }
@@ -54,7 +51,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   // 🔄 Actualiza el carrito cuando cambia el usuario
   Future<void> _actualizarUsuario(
       ActualizarUsuario event, Emitter<CartState> emit) async {
-    print("🔄 Cambió el usuario, recargando carrito...");
     _iniciarEscuchaCarrito(); // Reiniciar la escucha del carrito con el nuevo usuario
   }
 
@@ -63,19 +59,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     _cartSubscription?.cancel(); // Evita múltiples suscripciones
 
     _cartSubscription = cartRepository.escucharCarrito().listen((productos) {
-      print("📦 Productos en el carrito: ${productos.length}");
       add(ActualizarCarritoEvent(productos));
     }, onError: (error) {
-      print("❌ Error escuchando el carrito: $error");
-      add(ActualizarCarritoEvent([])); // Evita que se quede cargando
+      add(ActualizarCarritoEvent(const [])); // Evita que se quede cargando
     });
   }
 
   // 🔄 Actualiza el estado del carrito con los productos en Firestore
   Future<void> _actualizarCarrito(
       ActualizarCarritoEvent event, Emitter<CartState> emit) async {
-    print(
-        "🔄 Estado del carrito actualizado con ${event.productos.length} productos");
     emit(CartCargado(event.productos));
   }
 
@@ -85,7 +77,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        print("❌ Error: Usuario no autenticado.");
         emit(CartError("Usuario no autenticado"));
         return;
       }
@@ -93,11 +84,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       for (int i = 0; i < event.cantidad; i++) {
         await agregarProducto(event.producto);
       }
-
-      print(
-          "✅ ${event.cantidad} unidades de '${event.producto.name}' añadidas al carrito.");
     } catch (e) {
-      print("❌ Error al agregar producto: ${e.toString()}");
       emit(CartError("Error al agregar producto: ${e.toString()}"));
     }
   }
@@ -107,9 +94,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       EliminarProductoDelCarrito event, Emitter<CartState> emit) async {
     try {
       await eliminarProducto(event.productoId);
-      print("✅ Producto eliminado: ${event.productoId}");
     } catch (e) {
-      print("❌ Error al eliminar producto: ${e.toString()}");
       emit(CartError("Error al eliminar producto: ${e.toString()}"));
     }
   }
@@ -119,10 +104,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       ModificarCantidadProducto event, Emitter<CartState> emit) async {
     try {
       await modificarCantidad(event.productoId, event.nuevaCantidad);
-      print(
-          "🔄 Cantidad de '${event.productoId}' modificada a ${event.nuevaCantidad}");
     } catch (e) {
-      print("❌ Error al modificar cantidad: ${e.toString()}");
       emit(CartError("Error al modificar cantidad: ${e.toString()}"));
     }
   }
@@ -132,9 +114,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       VaciarCarrito event, Emitter<CartState> emit) async {
     try {
       await vaciarCarrito();
-      print("🗑️ Carrito vaciado exitosamente.");
     } catch (e) {
-      print("❌ Error al vaciar el carrito: ${e.toString()}");
       emit(CartError("Error al vaciar el carrito: ${e.toString()}"));
     }
   }

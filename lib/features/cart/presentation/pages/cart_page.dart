@@ -45,7 +45,7 @@ class CartPage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: ListTile(
         leading: _buildProductImage(
-            item.producto.imageUrl ?? ""), // 👈 Asegurar que no sea nulo
+            item.producto.imageUrl), // 👈 Asegurar que no sea nulo
         title: Text(item.producto.name),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
