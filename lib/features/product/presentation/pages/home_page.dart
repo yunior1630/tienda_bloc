@@ -157,7 +157,7 @@ class HomePage extends StatelessWidget {
                   itemCount: products.length,
                   itemBuilder: (context, index) {
                     final product = products[index];
-                    return _buildProductItem(product);
+                    return _buildProductItem(product, context);
                   },
                 ),
               );
@@ -168,52 +168,86 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildProductItem(ProductModel product) {
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
+  Widget _buildProductItem(ProductModel product, context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.productDetail,
+          arguments: product,
+        );
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
               color: Colors.grey.withOpacity(0.3),
               blurRadius: 5,
-              spreadRadius: 2),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.network(product.imageUrl,
-                height: 130, width: double.infinity, fit: BoxFit.cover),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Row(
-                  children: [
-                    Text("\$${product.price}",
-                        style:
-                            const TextStyle(color: Colors.blue, fontSize: 16)),
-                    const SizedBox(width: 5),
-                    Text("${product.discount} off",
-                        style:
-                            const TextStyle(color: Colors.green, fontSize: 12)),
-                  ],
-                ),
-              ],
+              spreadRadius: 2,
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10)),
+              child: _buildProductImage(
+                  product.imageUrl), // ✅ Manejamos imagenes nulas o vacías
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(product.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      Text("\$${product.price}",
+                          style: const TextStyle(
+                              color: Colors.blue, fontSize: 16)),
+                      const SizedBox(width: 5),
+                      Text("${product.discount} off",
+                          style: const TextStyle(
+                              color: Colors.green, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+// ✅ Función auxiliar para manejar imágenes sin URL
+  Widget _buildProductImage(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return Image.asset(
+        "assets/imagen_no_disponible.png", // Imagen por defecto
+        height: 130,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Image.network(
+        imageUrl,
+        height: 130,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset(
+              "assets/imagen_no_disponible.png"); // Imagen en caso de error
+        },
+      );
+    }
   }
 
   Widget _buildBottomNavBar(BuildContext context) {

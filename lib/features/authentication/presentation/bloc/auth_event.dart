@@ -17,6 +17,15 @@ class SignInWithEmailEvent extends AuthEvent {
   List<Object?> get props => [email, password];
 }
 
+class SignInWithPinEvent extends AuthEvent {
+  final String pin;
+
+  SignInWithPinEvent({required this.pin});
+
+  @override
+  List<Object?> get props => [pin];
+}
+
 class SignOutEvent extends AuthEvent {}
 
 class CheckAuthEvent extends AuthEvent {}

@@ -40,20 +40,12 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  // Widget para mostrar cada producto en el carrito
   Widget _buildCartItem(BuildContext context, CartItemEntity item) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: ListTile(
-        leading: Image.network(
-          item.producto.imageUrl,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset("assets/imagen_no_disponible.png");
-          },
-        ),
+        leading: _buildProductImage(
+            item.producto.imageUrl ?? ""), // 👈 Asegurar que no sea nulo
         title: Text(item.producto.name),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,6 +92,28 @@ class CartPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    // Si la URL está vacía o nula, cargar la imagen por defecto
+    if (imageUrl.isEmpty) {
+      return Image.asset(
+        "assets/imagen_no_disponible.png",
+        width: 50,
+        height: 50,
+        fit: BoxFit.cover,
+      );
+    }
+
+    return Image.network(
+      imageUrl,
+      width: 50,
+      height: 50,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Image.asset("assets/imagen_no_disponible.png");
+      },
     );
   }
 

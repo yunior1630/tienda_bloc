@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_event.dart';
 import 'package:tienda_bloc/features/authentication/presentation/bloc/auth_state.dart';
+import 'package:tienda_bloc/features/authentication/presentation/pages/pin_login_page.dart';
 import '../../../product/presentation/pages/home_page.dart';
 import '../bloc/auth_bloc.dart';
 
@@ -206,6 +207,32 @@ class LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 15),
+
+                      // ✅ Botón para iniciar sesión con PIN
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => PinLoginPage()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(color: Colors.green),
+                            ),
+                          ),
+                          child: const Text("Sign in with PIN",
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.green)),
+                        ),
+                      ),
+
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -235,7 +262,7 @@ class LoginPageState extends State<LoginPage> {
       ),
       child: const Center(
         child: Text(
-          "Tienda bloc",
+          "Tienda Bloc",
           style: TextStyle(
               fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
         ),

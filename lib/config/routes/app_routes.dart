@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:tienda_bloc/features/product/domain/entities/product_entity.dart';
-import '../../features/cart/presentation/pages/cart_page.dart';
-import '../../features/authentication/presentation/pages/login_page.dart';
-import '../../features/product/presentation/pages/home_page.dart';
-import '../../features/product/presentation/pages/product_detail_page.dart';
+import 'package:tienda_bloc/features/authentication/presentation/pages/login_page.dart';
+import 'package:tienda_bloc/features/product/presentation/pages/home_page.dart';
+import 'package:tienda_bloc/features/product/presentation/pages/product_detail_page.dart';
+import 'package:tienda_bloc/features/cart/presentation/pages/cart_page.dart';
+import 'package:tienda_bloc/features/product/data/models/product_model.dart';
 
 class AppRoutes {
   static const String login = '/login';
   static const String home = '/home';
   static const String productDetail = '/productDetail';
-  static const String cart = '/cart'; // <-- Nueva ruta del carrito
+  static const String cart = '/cart';
+  static const String category = '/category';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -18,13 +19,17 @@ class AppRoutes {
       case home:
         return MaterialPageRoute(builder: (_) => HomePage());
       case productDetail:
-        final product = settings.arguments as ProductEntity;
+        final product = settings.arguments as ProductModel;
         return MaterialPageRoute(
-          builder: (_) => ProductDetailPage(product: product),
+          builder: (context) => ProductDetailPage(product: product),
         );
+      // case category:
+      //   final category = settings.arguments as String;
+      //   return MaterialPageRoute(
+      //     builder: (context) => CategoryPage(category: category),
+      //   );
       case cart:
-        return MaterialPageRoute(
-            builder: (_) => const CartPage()); // <-- Ruta del carrito
+        return MaterialPageRoute(builder: (_) => const CartPage());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

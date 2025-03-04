@@ -1,55 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tienda_bloc/features/cart/presentation/bloc/cart_bloc.dart';
 import 'package:tienda_bloc/features/cart/presentation/bloc/cart_event.dart';
 import '../../domain/entities/product_entity.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends StatefulWidget {
   final ProductEntity product;
 
   const ProductDetailPage({super.key, required this.product});
 
   @override
+  _ProductDetailPageState createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
+  int cantidad = 1; // Contador de cantidad de productos
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Detalles del Producto"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share, color: Colors.blue),
+            onPressed: () {
+              // Compartir producto
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Imagen del producto
-            SizedBox(
+            Container(
               height: 250,
               width: double.infinity,
+              color: Colors.grey[200], // Color de fondo para la imagen
               child: Image.network(
-                product.imageUrl,
+                widget.product.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset("assets/imagen_no_disponible.png");
                 },
               ),
             ),
-            const SizedBox(height: 10),
-            // Información del producto
+
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
+                    widget.product.name,
                     style: const TextStyle(
                         fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
+
+                  // Sección de calificación y opiniones
                   Row(
                     children: [
                       Container(
@@ -64,7 +79,7 @@ class ProductDetailPage extends StatelessWidget {
                             const Icon(Icons.star,
                                 color: Colors.orange, size: 16),
                             Text(
-                              product.rating.toString(),
+                              widget.product.rating.toString(),
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -75,26 +90,21 @@ class ProductDetailPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.share, color: Colors.blue),
-                        onPressed: () {
-                          // Compartir producto
-                        },
-                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
+
+                  // Precio y descuento
                   Row(
                     children: [
                       Text(
-                        "\$${product.price}",
+                        "\$${widget.product.price}",
                         style:
                             const TextStyle(fontSize: 22, color: Colors.blue),
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        "\$${(product.price * 1.2).toStringAsFixed(2)}",
+                        "\$${(widget.product.price * 1.2).toStringAsFixed(2)}",
                         style: const TextStyle(
                           fontSize: 16,
                           decoration: TextDecoration.lineThrough,
@@ -103,100 +113,137 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        "${product.discount} de descuento",
+                        "${widget.product.discount} de descuento",
                         style:
                             const TextStyle(color: Colors.green, fontSize: 16),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
+
+                  // Descripción del producto
                   const Text(
                     "Descripción",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  Text(product.description),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Sección de detalles del producto
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Detalles del Producto",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  _filaDetalle("Marca", "ABC Brand"),
-                  _filaDetalle("Tipo", "Móviles y accesorios"),
-                  _filaDetalle("Peso", "382 gramos"),
-                  _filaDetalle("Sistema Operativo", "Android 11"),
+                  Text(widget.product.description),
                 ],
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _botonAgregarCarrito(context),
+
+      // 🔻 Botón de agregar al carrito con contador
+      bottomNavigationBar: _buildBottomBar(context),
     );
   }
 
-  // Widget para mostrar detalles en filas
-  Widget _filaDetalle(String titulo, String valor) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+  // 🔢 Selector de cantidad de productos
+  Widget _buildCantidadSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            titulo,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          IconButton(
+            icon: const Icon(Icons.remove_circle_outline, color: Colors.blue),
+            onPressed: cantidad > 1
+                ? () {
+                    setState(() {
+                      cantidad--;
+                    });
+                  }
+                : null, // Desactiva si cantidad es 1
           ),
           Text(
-            valor,
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
+            cantidad.toString(),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
+            onPressed: () {
+              setState(() {
+                cantidad++;
+              });
+            },
           ),
         ],
       ),
     );
   }
 
-  // Botón inferior para agregar al carrito
-  Widget _botonAgregarCarrito(BuildContext context) {
+  // 🛍 Sección de la barra inferior con botón y contador
+  Widget _buildBottomBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: ElevatedButton(
-        onPressed: () {
-          BlocProvider.of<CartBloc>(context)
-              .add(AgregarProductoAlCarrito(product));
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-        ),
-        child: const Text(
-          "Añadir al Carrito",
-          style: TextStyle(fontSize: 18, color: Colors.white),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF8F8F8),
+        border: Border(
+          top: BorderSide(color: Colors.grey, width: 0.5),
         ),
       ),
+      child: Row(
+        children: [
+          // Contador de productos
+          _buildCantidadSelector(),
+
+          const SizedBox(width: 10),
+
+          // Botón de agregar al carrito
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Agregar producto con la cantidad seleccionada
+                  BlocProvider.of<CartBloc>(context).add(
+                    AgregarProductoAlCarrito(widget.product, cantidad),
+                  );
+
+                  // Mostrar modal de confirmación
+                  _mostrarModalConfirmacion(context, cantidad);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text(
+                  "Añadir al Carrito",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ Modal de confirmación tras agregar productos
+  void _mostrarModalConfirmacion(BuildContext context, int cantidadAgregada) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Producto agregado"),
+          content: Text("Se añadieron $cantidadAgregada unidades al carrito."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Cierra el modal
+              },
+              child: const Text("Aceptar"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
